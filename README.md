@@ -30,7 +30,7 @@ Reads `.eml` files exported from Proton Mail, summarizes each newsletter in Fren
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/newsletter-digest.git
+git clone https://github.com/Candyfair/newsletter-digest.git
 cd newsletter-digest
 
 pip install beautifulsoup4 requests python-dotenv
