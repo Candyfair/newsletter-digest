@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Newsletters résumées</title>
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0f1117;
+      --surface:     #1a1d27;
+      --surface2:    #22263a;
+      --border:      #2e3250;
+      --accent:      #6c8efb;
+      --accent2:     #a78bfa;
+      --text:        #e2e8f0;
+      --text-muted:  #8892b0;
+      --error:       #fc8181;
+      --radius:      10px;
+      --font:        'Inter', system-ui, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .container { max-width: 860px; margin: 0 auto; }
+
+    header {
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header .meta {
+      margin-top: .5rem;
+      font-size: .85rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Theme sections ───────────────────────────────────────── */
+    .theme-section { margin-bottom: 3rem; }
+    .theme-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      padding-bottom: .4rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    /* ── Sender groups ────────────────────────────────────────── */
+    .sender-group { margin-bottom: 1.75rem; }
+    .sender-title {
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: .75rem;
+    }
+
+    /* ── Cards ────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: .75rem;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card-error { border-color: var(--error); opacity: .8; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: .6rem;
+    }
+    .card-subject {
+      font-weight: 600;
+      font-size: .95rem;
+      color: var(--text);
+      flex: 1;
+    }
+    .card-date {
+      font-size: .75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .card-summary {
+      font-size: .88rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+    .card-error-msg {
+      font-size: .85rem;
+      color: var(--error);
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      font-size: .75rem;
+      color: var(--text-muted);
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Newsletters résumées</h1>
+      <p class="meta">
+        5 résumé(s) sur 5 newsletter(s) &mdash;
+        généré le 07/04/2026 à 23:29
+      </p>
+    </header>
+
+    <section class="theme-section">
+  <h2 class="theme-title">Intelligence artificielle</h2>
+  <div class="sender-group">
+    <h3 class="sender-title">Code Like A Girl <codelikeagirl@substack.com></h3>
+
+    <article class="card ">
+      <div class="card-header">
+        <span class="card-subject">The Feedback That Taught Me Everything About Women and Power</span>
+        <span class="card-date">6 avril 2026</span>
+      </div>
+      <p class="card-summary">Dans le monde corporatif, les femmes sont souvent contraintes de choisir entre l'imposture ou une surconfiance exagérée. Elles doivent s'adapter à des environnements où leur place est toujours en question. Emanuela B raconte son expérience personnelle et souligne l'importance d'aider les femmes à trouver leurs propres ressources et à définir leur propre chemin vers le succès, sans se laisser guider par des stratégies de survie calibrées à un moment donné.
+
+Code Like a Girl est une plateforme qui publie régulièrement les travaux de femmes technologues pensives et engagées, dont Emanuela B fait partie. La plateforme propose également une colonne payante intitulée Her Edge, écrite par la fondatrice Dinah, ainsi qu'un chat de discussion payant où les abonnés peuvent poser des questions directement à Dinah.
+
+Pour célébrer le lancement de cette colonne, Code Like a Girl offre un rabais de 75% sur une abonnement annuel pour toute personne qui s'abonne en avril. Aucun code promo n'est nécessaire, il suffit de cliquer sur le bouton d'abonnement.
+
+Code Like a Girl est reconnaissante envers Emanuela B pour avoir permis de partager son histoire sur leur plateforme.</p>
+    </article>
+  </div>
+  <div class="sender-group">
+    <h3 class="sender-title">Jérôme Marin / Cafétech <cafetech@substack.com></h3>
+
+    <article class="card ">
+      <div class="card-header">
+        <span class="card-subject">SpaceX décolle vers Wall Street</span>
+        <span class="card-date">2 avril 2026</span>
+      </div>
+      <p class="card-summary">SpaceX prépare son introduction en Bourse pour lever 75 milliards de dollars et financer des data centers spatiaux destinés à entraîner et faire tourner des modèles d'IA. Cette opération, qui pourrait intervenir au mois de juin, pourrait également justifier une capitalisation boursière record de 1,75 milliard de dollars. SpaceX a révolutionné le marché des lanceurs grâce à ses fusées réutilisables et a imposé sa constellation de satellites Starlink. Son chiffre d'affaires a été multiplié par dix en trois ans, pour atteindre 15 milliards de dollars. Oracle mène une vague massive de licenciements pour réduire ses coûts face à l'explosion de ses investissements dans l'IA. Le nombre exact de suppressions de postes n'est pas connu, mais la presse américaine évoque des milliers de salariés concernés.</p>
+    </article>
+  </div>
+  <div class="sender-group">
+    <h3 class="sender-title">Kyle T Webster from The Accidental Expert <kyletwebster@substack.com></h3>
+
+    <article class="card ">
+      <div class="card-header">
+        <span class="card-subject">Fundamental Attribution Error</span>
+        <span class="card-date">3 avril 2026</span>
+      </div>
+      <p class="card-summary">Entre 2013 et 2017, la vente de mon entreprise KyleBrush a été facilitée par plusieurs facteurs extérieurs à ma contrôle. L'internet était déjà utilisé par des millions de personnes pour acheter en ligne, créant ainsi l'environnement idéal pour un business comme le mien. Gumroad, lancé en 2011, m'a permis de vendre facilement des produits numériques à travers le monde. Les progrès technologiques dans les outils de dessin numérique ont permis aux pinceaux personnalisés que j'avais créés de fonctionner sans retard et d'offrir une expérience satisfaisante aux artistes. Les studios d'animation et de jeux avaient déjà adopté des workflows entièrement numériques, nécessitant des pinceaux et outils de qualité supérieure. Enfin, les plateformes sociales (Twitter et Tumblr notamment) étaient encore utiles pour la promotion rapide et organique de mes produits. L'économie américaine était en pleine récupération de la crise économique et l'emploi dans le domaine de l'illustration et de l'animation augmentait. Les professionnels, étudiants et passionnés du domaine de l'art numérique étaient prêts à dépenser quelques dollars pour améliorer leur expérience d'art numérique avec des pinceaux personnalisés. Tout cela n'a pas été un formulaire pour mon succès, mais plutôt une combinaison de conditions et de tendances favorables que j'ai su exploiter.</p>
+    </article>
+  </div>
+  <div class="sender-group">
+    <h3 class="sender-title">Slow AI  <theslowai@substack.com></h3>
+
+    <article class="card ">
+      <div class="card-header">
+        <span class="card-subject">AI Agents Do Not Play Games. You Do.</span>
+        <span class="card-date">4 mars 2026</span>
+      </div>
+      <p class="card-summary">Les agents AI sont présentés comme des intermédiaires indispensables dans de nombreux domaines, mais personne ne vous explique qui subit les conséquences lorsque ces agents commettent une erreur. Un agent AI peut réserver vos vols, envoyer vos emails et négocier en votre nom. Il ignore toutefois si ces actions sont judicieuses ou non. L'ensemble du cadre de l'interaction stratégique s'effondre lorsque l'un des joueurs a rien à perdre.
+
+Examinez pourquoi le langage de l'« autonomie » et de la « stratégie » est trompeur quand appliqué aux agents AI. Regardez ce qui se passe réellement lorsque les agents AI interagissent entre eux et avec les humains.
+
+Voici trois questions (section payante) qui coupent le marketing et protègent votre jugement :
+
+1. Quels sont les intérêts de l'agent ?
+2. Qui subit les conséquences lorsque l'agent commet une erreur ?
+3. Comment l'agent prend-il en compte les conséquences pour les humains ?
+
+Le mot « agent » fait un grand travail actuellement. OpenAI, Microsoft, Perplexity et Google sont tous en train de vendre des systèmes AI qu'ils appellent des agents. Le langage est délibéré : les agents ont une autonomie, ils prennent des décisions, ils stratégisent. Perplexity a lancé un produit dernier semaine appelé « Ordinateur » qui coordonne 19 modèles AI en tant que « employés spécialisés ». Il coûte 200 dollars par mois. Le cadre est explicite : ces sont des travailleurs numériques.
+
+Un agent AI est une fonction exécutrice avec accès aux outils. Il peut naviguer sur le web, envoyer des emails, écrire du code et réserver des vols. Certains agents requièrent l'approbation humaine avant d'agir. Certains fonctionnent sans surveillance pendant des heures ou des mois. Les architectures varient. Ce qui ne varie pas est que l'agent ignore si ces actions sont judicieuses ou non. Il n'a pas de préférences, il n'a pas de réputation, il n'a pas peur d'être mauvais. Il subit aucune conséquence pour l'échec.
+
+Cela importe parce que le champ entier de l'</p>
+    </article>
+
+    <article class="card ">
+      <div class="card-header">
+        <span class="card-subject">AI Is Improving Student Performance. It Is Also Destroying Student Learning.</span>
+        <span class="card-date">3 avril 2026</span>
+      </div>
+      <p class="card-summary">Le rapport de l'Université de Technologie Sydney, écrit par les professeurs Jason Lodge et Leslie Loble, met en évidence un paradoxe appelé « le paradoxe du rendement » dans l'utilisation incontrôlée de l'IA en éducation. Selon ce rapport, l'utilisation de l'IA pour gérer les tâches pénibles (comme la correction orthographique ou la réformulation des listes de références) libère la mémoire de travail des élèves pour le travail cognitif difficile (comme la construction d'arguments, l'évaluation des preuves et la synthèse des sources). Cela est appelé offloading bénéfique. Toutefois, lorsque les élèves utilisent l'IA pour éviter le travail cognitif lui-même ("écris-moi un essai sur les causes de la Première Guerre mondiale"), le processus d'élaboration des idées s'effondre. L'utilisation de l'IA entraîne une illusion de compétence qui érode la pensée critique. Le rapport souligne que la distinction entre offloading bénéfique et offloading délétère est cruciale pour les enseignants, les parents et les gestionnaires actuels. Les étudiants ont des notes plus élevées mais leur apprentissage est moins bon.</p>
+    </article>
+  </div>
+</section>
+
+
+    <footer>
+      Pipeline local · Ollama (mistral:7b) · Proton Mail exports
+    </footer>
+  </div>
+</body>
+</html>
