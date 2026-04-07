@@ -1,2 +1,4 @@
 .env
 emails/
+
+.DS_Store
