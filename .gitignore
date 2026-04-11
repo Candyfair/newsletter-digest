@@ -1,4 +1,8 @@
-.env
-emails/
-
 .DS_Store
+
+.env
+
+emails/
+venv/
+output/
+
