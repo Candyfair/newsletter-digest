@@ -380,6 +380,34 @@ def assign_themes(newsletters: list[Newsletter]) -> None:
         if not matched:
             nl.theme = "Autres"
 
+# ---------------------------------------------------------------------------
+# Step 4b – Write index.json
+# ---------------------------------------------------------------------------
+
+def write_index(newsletters: list[Newsletter], output_path: Path, uid_map: dict) -> None:
+    """
+    Write a structured JSON index of all newsletters.
+    Used by the React frontend to populate SummaryList and handle deletions.
+    """
+    index = []
+    for nl in newsletters:
+        filename = nl.file_path.name
+        index.append({
+            "id":      str(nl.file_path),   # relative path used as stable React key
+            "uid":     uid_map.get(filename),# IMAP UID — None if not found in map
+            "subject": nl.subject,
+            "sender":  nl.sender,
+            "date":    nl.date.isoformat() if nl.date else None,
+            "summary": nl.summary,
+            "theme":   nl.theme,
+        })
+
+    index_path = output_path.parent / "index.json"
+    index_path.write_text(
+        json.dumps(index, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    log.info("index.json written to %s", index_path)
 
 # ---------------------------------------------------------------------------
 # Step 4 – Render HTML
@@ -656,21 +684,50 @@ def main() -> None:
     if not newsletters:
         sys.exit(1)
 
-    # ── 2. Summarize via Ollama (unless --no-summary)
     if not args.no_summary:
         if not check_ollama(args.model):
             log.warning("Ollama check failed – summaries will be empty.")
         else:
+            progress_path = args.output.parent / "progress.json"
+
+            # Write total immediately so the UI can display it before summarization starts
+            progress_path.write_text(
+                json.dumps({"current": 0, "total": len(newsletters), "subject": ""}),
+                encoding="utf-8",
+            )
+
             for i, nl in enumerate(newsletters, 1):
-                log.info(
-                    "[%d/%d] Summarizing: %s", i, len(newsletters), nl.subject
+                log.info("[%d/%d] Summarizing: %s", i, len(newsletters), nl.subject)
+
+                # Write current progress so Flask can expose it via GET /status
+                progress_path.write_text(
+                    json.dumps({
+                        "current": i,
+                        "total":   len(newsletters),
+                        "subject": nl.subject,
+                    }),
+                    encoding="utf-8",
                 )
+
                 summarize(nl, model=args.model)
+
+            # Clear progress file once done
+            progress_path.unlink(missing_ok=True)
 
     # ── 3. Assign themes
     assign_themes(newsletters)
 
-    # ── 4. Render HTML
+    # ── 4. Write index.json
+    uid_map_path = args.eml_dir / "uid_map.json"
+    uid_map = {}
+    if uid_map_path.exists():
+        try:
+            uid_map = json.loads(uid_map_path.read_text(encoding="utf-8"))
+        except Exception:
+            log.warning("Could not read uid_map.json — UIDs will be missing from index.")
+    write_index(newsletters, args.output, uid_map)
+
+    # ── 5. Render HTML
     if not args.dry_run:
         render_html(newsletters, args.output)
 
@@ -678,6 +735,7 @@ def main() -> None:
     ok  = sum(1 for nl in newsletters if nl.summary)
     err = sum(1 for nl in newsletters if nl.error)
     log.info("Done. %d summarized, %d error(s).", ok, err)
+
 
 
 if __name__ == "__main__":

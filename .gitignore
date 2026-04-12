@@ -2,7 +2,10 @@
 
 .env
 
-emails/
 venv/
-output/
 
+emails/
+emails/uid_map.json
+
+output/
+output/index.json

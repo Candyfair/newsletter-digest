@@ -11,6 +11,7 @@ import email
 import os
 import re
 import argparse
+import json
 from dotenv import load_dotenv
 
 # Load .env from the project root
@@ -22,11 +23,18 @@ def sanitize_filename(name: str) -> str:
     name = re.sub(r'[\\/*?:"<>|]', "_", name)
     return name[:80]
 
-
 def export_emails(host, port, username, password, folder, output_dir):
     """Connect to IMAP server and export emails as .eml files."""
 
     os.makedirs(output_dir, exist_ok=True)
+
+    # Load existing uid_map if present (preserves UIDs from previous exports)
+    uid_map_path = os.path.join(output_dir, "uid_map.json")
+    if os.path.exists(uid_map_path):
+        with open(uid_map_path, "r", encoding="utf-8") as f:
+            uid_map = json.load(f)
+    else:
+        uid_map = {}
 
     print(f"Connecting to {host}:{port}...")
     conn = imaplib.IMAP4(host, port)
@@ -42,13 +50,17 @@ def export_emails(host, port, username, password, folder, output_dir):
         conn.logout()
         return
 
-    _, message_ids = conn.search(None, "ALL")
-    ids = message_ids[0].split()
-    print(f"{len(ids)} email(s) found in '{folder}'")
+    # Use UID SEARCH instead of SEARCH for stable identifiers
+    _, message_ids = conn.uid("search", None, "ALL")
+    uids = message_ids[0].split()
+    print(f"{len(uids)} email(s) found in '{folder}'")
 
     exported = 0
-    for msg_id in ids:
-        _, msg_data = conn.fetch(msg_id, "(RFC822)")
+    for uid_bytes in uids:
+        uid = int(uid_bytes.decode())
+
+        # Fetch raw email by UID
+        _, msg_data = conn.uid("fetch", uid_bytes, "(RFC822)")
         raw_email = msg_data[0][1]
 
         parsed = email.message_from_bytes(raw_email)
@@ -64,6 +76,9 @@ def export_emails(host, port, username, password, folder, output_dir):
         filename = f"{date_prefix}_{sanitize_filename(subject)}.eml"
         filepath = os.path.join(output_dir, filename)
 
+        # Always update uid_map even if file already exists
+        uid_map[filename] = uid
+
         if os.path.exists(filepath):
             print(f"  [skip] {filename}")
             continue
@@ -75,6 +90,12 @@ def export_emails(host, port, username, password, folder, output_dir):
         exported += 1
 
     conn.logout()
+
+    # Write uid_map.json so summarize_newsletters.py can build index.json
+    with open(uid_map_path, "w", encoding="utf-8") as f:
+        json.dump(uid_map, f, ensure_ascii=False, indent=2)
+    print(f"uid_map.json updated ({len(uid_map)} entry/entries)")
+
     print(f"\nDone. {exported} new file(s) exported to '{output_dir}'")
 
 
