@@ -29,8 +29,28 @@ export default function SummaryList() {
   }, [])
 
   async function confirmDelete() {
-    // TODO: implement DELETE /email once backend is ready
-    console.log('Deleting:', [...selected])
+    // Build payload from selected ids
+    const selectedItems = newsletters.filter(nl => selected.has(nl.id))
+    const ids  = selectedItems.map(nl => nl.id)
+    const uids = selectedItems.map(nl => nl.uid).filter(Boolean)
+
+    try {
+      const res = await fetch('/api/email', {
+        method:  'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ ids, uids }),
+      })
+
+      if (res.ok) {
+        // Remove deleted newsletters from local state immediately
+        setNewsletters(prev => prev.filter(nl => !selected.has(nl.id)))
+      } else {
+        console.error('Delete failed:', await res.json())
+      }
+    } catch (err) {
+      console.error('Network error during delete:', err)
+    }
+
     cancelSelection()
   }
 
