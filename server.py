@@ -7,7 +7,83 @@ import json
 from pathlib import Path
 import logging
 import imaplib
+import requests
 from dotenv import load_dotenv
+import smtplib
+from email.mime.text import MIMEText
+
+def notify_ntfy(success: bool, count: int = 0, error: str = None) -> None:
+    """Send a push notification via ntfy.sh."""
+    topic = os.getenv("NTFY_TOPIC")
+    if not topic:
+        log.warning("NTFY_TOPIC not set — skipping push notification")
+        return
+
+    if success:
+        title   = "Digest ready"
+        message = f"{count} newsletter(s) résumée(s)"
+        tags    = "white_check_mark"
+        priority = "default"
+    else:
+        title   = "Erreur pipeline"
+        message = error or "Une erreur est survenue"
+        tags    = "x"
+        priority = "high"
+
+    try:
+        requests.post(
+            f"https://ntfy.sh/{topic}",
+            headers={
+                "Title":    title,
+                "Tags":     tags,
+                "Priority": priority,
+            },
+            data=message.encode("utf-8"),
+            timeout=10,
+        )
+        log.info("ntfy notification sent: %s", title)
+    except Exception as exc:
+        log.error("ntfy notification failed: %s", exc)
+
+
+def notify_email(success: bool, count: int = 0, error: str = None) -> None:
+    """Send a summary email via Proton Mail Bridge SMTP."""
+    smtp_host = os.getenv("IMAP_HOST", "127.0.0.1")
+    smtp_port = int(os.getenv("SMTP_PORT", 1025))
+    username  = os.getenv("PROTON_USERNAME")
+    password  = os.getenv("PROTON_BRIDGE_PASSWORD")
+    recipient = os.getenv("NOTIFY_EMAIL")
+
+    if not all([username, password, recipient]):
+        log.warning("SMTP credentials incomplete — skipping email notification")
+        return
+
+    if success:
+        subject = f"Digest prêt — {count} newsletter(s) résumée(s)"
+        body    = (
+            f"Le pipeline newsletter-digest s'est terminé avec succès.\n\n"
+            f"{count} newsletter(s) ont été résumées et sont disponibles dans le digest."
+        )
+    else:
+        subject = "Erreur pipeline newsletter-digest"
+        body    = (
+            f"Le pipeline newsletter-digest a rencontré une erreur.\n\n"
+            f"Détail : {error or 'inconnu'}"
+        )
+
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = subject
+    msg["From"]    = username
+    msg["To"]      = recipient
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as smtp:
+            smtp.login(username, password)
+            smtp.sendmail(username, recipient, msg.as_string())
+        log.info("Email notification sent to %s", recipient)
+    except Exception as exc:
+        log.error("Email notification failed: %s", exc)
+
 
 load_dotenv()
 
@@ -41,6 +117,14 @@ def run_pipeline():
     progress_path = Path(BASE_DIR) / "output" / "progress.json"
     progress_path.unlink(missing_ok=True)
 
+    # Clear previous digest and index
+    (Path(BASE_DIR) / "output" / "index.html").unlink(missing_ok=True)
+    (Path(BASE_DIR) / "output" / "index.json").unlink(missing_ok=True)
+
+    # Clear previous .eml files
+    for eml_file in (Path(BASE_DIR) / "emails").glob("*.eml"):
+        eml_file.unlink()
+
     scripts = [
         ["python3", os.path.join(BASE_DIR, "export_emails.py")],
         ["python3", os.path.join(BASE_DIR, "summarize_newsletters.py"),
@@ -55,15 +139,31 @@ def run_pipeline():
         current_process["proc"] = None
 
         if proc.returncode not in (0, -9, -15):  # -9/-15 = killed signals
+            error_msg = f"Échec : {os.path.basename(script[1])}"
             with state_lock:
                 pipeline_state["status"] = "error"
-                pipeline_state["error"]  = f"Échec : {os.path.basename(script[1])}"
+                pipeline_state["error"]  = error_msg
+            notify_ntfy(success=False, error=error_msg)
+            # notify_email(success=False, error=error_msg)  # Send notification e-mail
             return
 
     with state_lock:
         # Only mark done if not already cancelled
         if pipeline_state["status"] == "running":
             pipeline_state["status"] = "done"
+
+    # Count summarized newsletters from index.json
+    count = 0
+    index_path = Path(BASE_DIR) / "output" / "index.json"
+    if index_path.exists():
+        try:
+            index = json.loads(index_path.read_text(encoding="utf-8"))
+            count = sum(1 for nl in index if nl.get("summary"))
+        except Exception:
+            pass
+
+    notify_ntfy(success=True, count=count)
+    # notify_email(success=True, count=count)   # Send notification e-mail
 
 
 @app.route("/health")

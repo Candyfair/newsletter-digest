@@ -21,7 +21,7 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from email import policy
-from email.utils import parsedate_to_datetime
+from email.utils import parsedate_to_datetime, parseaddr
 from pathlib import Path
 from typing import Optional
 
@@ -192,7 +192,11 @@ def parse_eml(file_path: Path) -> Newsletter:
             msg = email.message_from_binary_file(f, policy=policy.default)
 
         newsletter.subject = msg.get("subject", "(no subject)").strip()
-        newsletter.sender  = msg.get("from", "(unknown sender)").strip()
+        raw_from = msg.get("from", "")
+        # parseaddr returns ("Display Name", "email@address.com")
+        # We keep only the display name, falling back to the email address
+        display_name, email_addr = parseaddr(raw_from)
+        newsletter.sender = display_name.strip() if display_name.strip() else email_addr.strip()
 
         # Parse date
         raw_date = msg.get("date")

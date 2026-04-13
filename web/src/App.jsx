@@ -19,8 +19,7 @@ export default function App() {
           onRun={startPolling}
         />
 
-        {/* Always mounted — shows content only if index.json returns data */}
-        <SummaryList />
+        <SummaryList status={status} />
       </main>
     </div>
   )

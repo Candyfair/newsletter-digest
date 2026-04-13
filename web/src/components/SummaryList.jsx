@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
 import { t } from '../i18n/translations'
 
-export default function SummaryList() {
+export default function SummaryList({ status }) {
   const {
     lang,
     selected, toggleCard,
@@ -15,18 +15,28 @@ export default function SummaryList() {
 
   useEffect(() => {
     async function fetchIndex() {
+      setLoading(true)
       try {
         const res  = await fetch('/api/index')
         const data = await res.json()
-        setNewsletters(data)
+        setNewsletters(Array.isArray(data) ? data : [])
       } catch {
-        // Silent fail — empty list is shown
+        setNewsletters([])
       } finally {
         setLoading(false)
       }
     }
+
+  // Reload when pipeline completes or on mount
+  if (status === 'done' || status === 'idle') {
     fetchIndex()
-  }, [])
+  }
+
+  // Clear list immediately when a new pipeline starts
+  if (status === 'running') {
+    setNewsletters([])
+  }
+}, [status])
 
   async function confirmDelete() {
     // Build payload from selected ids
