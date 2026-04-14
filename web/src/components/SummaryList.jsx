@@ -74,27 +74,31 @@ export default function SummaryList({ status }) {
     })
   }
 
-  // Group by sender
+  // Group by theme → sender
   const grouped = newsletters.reduce((acc, nl) => {
-    if (!acc[nl.sender]) acc[nl.sender] = []
-    acc[nl.sender].push(nl)
+    const theme = nl.theme || 'Autres'
+    if (!acc[theme]) acc[theme] = {}
+    if (!acc[theme][nl.sender]) acc[theme][nl.sender] = []
+    acc[theme][nl.sender].push(nl)
     return acc
   }, {})
 
-  // Sort each group anti-chronologically
-  Object.values(grouped).forEach(group => {
-    group.sort((a, b) => {
-      if (!a.date) return 1
-      if (!b.date) return -1
-      return new Date(b.date) - new Date(a.date)
+  // Sort each sender group anti-chronologically
+  Object.values(grouped).forEach(themeGroup => {
+    Object.values(themeGroup).forEach(group => {
+      group.sort((a, b) => {
+        if (!a.date) return 1
+        if (!b.date) return -1
+        return new Date(b.date) - new Date(a.date)
+      })
     })
   })
 
-  // Sort senders by most recent newsletter
-  const sortedSenders = Object.keys(grouped).sort((a, b) => {
-    const latestA = grouped[a][0]?.date ?? ''
-    const latestB = grouped[b][0]?.date ?? ''
-    return new Date(latestB) - new Date(latestA)
+  // Sort themes alphabetically, "Autres" last
+  const sortedThemes = Object.keys(grouped).sort((a, b) => {
+    if (a === 'Autres') return 1
+    if (b === 'Autres') return -1
+    return a.localeCompare(b, lang)
   })
 
   if (loading || newsletters.length === 0) return null
@@ -150,58 +154,77 @@ export default function SummaryList({ status }) {
       )}
 
       {/* Grouped cards */}
-      <div className="flex flex-col gap-8">
-        {sortedSenders.map(sender => (
-          <div key={sender} className="flex flex-col gap-3">
-            <h3 className="text-xs font-semibold uppercase tracking-widest
-              text-gray-400 dark:text-gray-500"
+      <div className="flex flex-col gap-10">
+        {sortedThemes.map(theme => (
+          <div key={theme} className="flex flex-col gap-6">
+            <h2 className="text-sm font-semibold uppercase tracking-widest
+              text-indigo-500 dark:text-indigo-400 border-b border-gray-200
+              dark:border-gray-700 pb-2"
             >
-              {sender}
-            </h3>
+              {theme}
+            </h2>
 
-            {grouped[sender].map(nl => {
-              const isSelected = selected.has(nl.id)
-              return (
-                <article
-                  key={nl.id}
-                  onClick={() => toggleCard(nl.id)}
-                  className={`
-                    flex flex-col gap-2 p-4 rounded-xl border cursor-pointer
-                    transition-all select-none
-                    ${isSelected
-                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40'
-                      : `border-gray-200 dark:border-gray-700
-                         bg-white dark:bg-gray-900
-                         hover:border-indigo-300 dark:hover:border-indigo-700`
-                    }
-                  `}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm font-semibold
-                      text-gray-900 dark:text-white"
-                    >
-                      {nl.subject}
-                    </span>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
-                        {formatDate(nl.date)}
-                      </span>
-                      {isSelected && (
-                        <span className="text-indigo-600 dark:text-indigo-400">✓</span>
-                      )}
-                    </div>
-                  </div>
+            {Object.keys(grouped[theme])
+              .sort((a, b) => {
+                // Sort senders by most recent newsletter within this theme
+                const latestA = grouped[theme][a][0]?.date ?? ''
+                const latestB = grouped[theme][b][0]?.date ?? ''
+                return new Date(latestB) - new Date(latestA)
+              })
+              .map(sender => (
+                <div key={sender} className="flex flex-col gap-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest
+                    text-gray-400 dark:text-gray-500"
+                  >
+                    {sender}
+                  </h3>
 
-                  {nl.summary && (
-                    <p className="text-sm leading-relaxed
-                      text-gray-600 dark:text-gray-400"
-                    >
-                      {nl.summary}
-                    </p>
-                  )}
-                </article>
-              )
-            })}
+                  {grouped[theme][sender].map(nl => {
+                    const isSelected = selected.has(nl.id)
+                    return (
+                      <article
+                        key={nl.id}
+                        onClick={() => toggleCard(nl.id)}
+                        className={`
+                          flex flex-col gap-2 p-4 rounded-xl border cursor-pointer
+                          transition-all select-none
+                          ${isSelected
+                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40'
+                            : `border-gray-200 dark:border-gray-700
+                              bg-white dark:bg-gray-900
+                              hover:border-indigo-300 dark:hover:border-indigo-700`
+                          }
+                        `}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-sm font-semibold
+                            text-gray-900 dark:text-white"
+                          >
+                            {nl.subject}
+                          </span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                              {formatDate(nl.date)}
+                            </span>
+                            {isSelected && (
+                              <span className="text-indigo-600 dark:text-indigo-400">✓</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {nl.summary && (
+                          <p className="text-sm leading-relaxed
+                            text-gray-600 dark:text-gray-400"
+                          >
+                            {nl.summary}
+                          </p>
+                        )}
+                      </article>
+                    )
+                  })}
+                </div>
+              ))
+            }
           </div>
         ))}
       </div>
