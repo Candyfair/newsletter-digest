@@ -2,7 +2,7 @@
 
 Automated pipeline to export, summarize and browse newsletters via a local LLM.
 
-Reads `.eml` files exported from Proton Mail, summarizes each newsletter in French using a local Ollama model, and generates a browsable dark-mode HTML page organized by theme and sender.
+Reads `.eml` files exported from Proton Mail, summarizes each newsletter in French using a local Ollama model, and generates a browsable dark-mode HTML page organized by theme and sender. A React web interface allows triggering the pipeline, monitoring progress in real time, and managing summaries.
 
 ---
 
@@ -15,13 +15,17 @@ Reads `.eml` files exported from Proton Mail, summarizes each newsletter in Fren
 - Generate a single dark-mode HTML page: theme → sender → chronological cards
 - Keyword-based theme attribution with fallback to summary content
 - Fully idempotent export (skips already-downloaded emails)
-- CLI interface for both scripts
+- CLI interface for both Python scripts
+- Flask API server to trigger and monitor the pipeline
+- React web interface with real-time progress, summary cards, and email deletion
+- Push notifications via ntfy.sh and email on pipeline completion
 
 ---
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.9+
+- Node.js 18+ (for the web interface)
 - [Ollama](https://ollama.com) running locally with a pulled model (e.g. `mistral:7b`)
 - [Proton Mail Bridge](https://proton.me/mail/bridge) (for email export)
 
@@ -32,8 +36,21 @@ Reads `.eml` files exported from Proton Mail, summarizes each newsletter in Fren
 ```bash
 git clone https://github.com/Candyfair/newsletter-digest.git
 cd newsletter-digest
+```
 
-pip install beautifulsoup4 requests python-dotenv
+### Python dependencies
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Web interface dependencies
+
+```bash
+cd web
+npm install
 ```
 
 ---
@@ -47,28 +64,74 @@ cp .env.example .env
 ```
 
 ```env
+# Proton Mail Bridge — IMAP
 PROTON_USERNAME=your@proton.me
-PROTON_BRIDGE_PASSWORD=your-bridge-password
+PROTON_BRIDGE_PASSWORD=your-bridge-imap-password
 PROTON_FOLDER=Newsletters
 IMAP_HOST=127.0.0.1
 IMAP_PORT=1143
+
+# Proton Mail Bridge — SMTP (for email notifications)
+SMTP_HOST=127.0.0.1
+SMTP_PORT=1025
+SMTP_USERNAME=your@proton.me
+SMTP_PASSWORD=your-bridge-smtp-password
+NOTIFY_TO=your@proton.me
+
+# Ollama
+OLLAMA_HOST=http://localhost:11434
+
+# ntfy.sh (push notifications)
+NTFY_TOPIC=your-ntfy-topic
 ```
 
 > `.env` is git-ignored. Never commit it.
 
 ---
 
-## Usage
+## Quick start
 
-### 1. Export emails from Proton Mail
+Make sure the following are running before starting:
 
-Make sure Proton Mail Bridge is running, then:
+- **Proton Mail Bridge** — for IMAP/SMTP access
+- **Ollama** — `ollama serve` with your model pulled (e.g. `ollama pull mistral:7b`)
+
+### 1. Activate the Python virtual environment
+
+```bash
+source venv/bin/activate
+```
+
+### 2. Start the Flask server
+
+```bash
+python server.py
+```
+
+Flask runs on `http://localhost:5000`.
+
+### 3. Start the web interface
+
+In a separate terminal:
+
+```bash
+cd web
+npm run dev
+```
+
+Open `http://localhost:5173` in your browser. Click **"Lancer le digest"** to start the pipeline. Progress is displayed in real time. When complete, a link to the generated digest appears.
+
+---
+
+## CLI usage
+
+The pipeline scripts can also be run directly without the web interface.
+
+### Export emails from Proton Mail
 
 ```bash
 python3 export_emails.py --output-dir ./emails
 ```
-
-All emails from the configured folder are saved as `.eml` files in `./emails/`.
 
 | Argument | Default | Description |
 |---|---|---|
@@ -79,9 +142,7 @@ All emails from the configured folder are saved as `.eml` files in `./emails/`.
 | `--folder` | from `.env` | IMAP folder to export |
 | `--output-dir` | `./emails` | Destination for `.eml` files |
 
-### 2. Summarize and generate HTML
-
-Make sure Ollama is running, then:
+### Summarize and generate HTML
 
 ```bash
 python3 summarize_newsletters.py \
@@ -89,8 +150,6 @@ python3 summarize_newsletters.py \
   --output ./output/index.html \
   --model mistral:7b
 ```
-
-Open `./output/index.html` in your browser to browse your summaries.
 
 | Argument | Default | Description |
 |---|---|---|
@@ -102,24 +161,49 @@ Open `./output/index.html` in your browser to browse your summaries.
 
 ---
 
+## Flask API
+
+| Method | Route | Description |
+|---|---|---|
+| `GET` | `/health` | Returns `{"status": "ok"}` |
+| `POST` | `/run` | Triggers the pipeline (non-blocking, returns `202`) |
+| `GET` | `/status` | Returns current pipeline status and progress |
+| `POST` | `/cancel` | Cancels a running pipeline |
+| `GET` | `/digest` | Serves the generated `output/index.html` |
+| `GET` | `/index` | Returns `output/index.json` (summary list) |
+| `DELETE` | `/email` | Deletes an email locally and moves it to IMAP Trash |
+
+---
+
 ## Project structure
 
 ```
 newsletter-digest/
-├── .env                  # Local secrets (git-ignored)
-├── .env.example          # Credentials template
+├── .env                        # Local secrets (git-ignored)
+├── .env.example                # Credentials template
 ├── .gitignore
-├── export_emails.py      # Step 1: export .eml from Proton Mail Bridge
-├── summarize_newsletters.py  # Step 2: summarize and generate HTML
-├── emails/               # Downloaded .eml files (git-ignored)
-└── output/               # Generated HTML page (git-ignored)
+├── requirements.txt            # Python dependencies
+├── export_emails.py            # Step 1: export .eml from Proton Mail Bridge
+├── summarize_newsletters.py    # Step 2: summarize and generate HTML
+├── server.py                   # Flask API server
+├── web/                        # React web interface (Vite + Tailwind v4)
+│   ├── src/
+│   │   ├── context/            # Global app context (theme, lang)
+│   │   └── ...
+│   ├── vite.config.js
+│   └── package.json
+├── emails/                     # Downloaded .eml files (git-ignored)
+└── output/                     # Generated HTML + JSON (git-ignored)
 ```
 
 ---
 
 ## Roadmap
 
-- [ ] Flask web interface with a trigger button and live logs
+- [x] Flask API server (trigger, status, cancel, digest)
+- [x] React web interface with real-time progress
+- [x] Email deletion from UI (local + IMAP Trash)
+- [x] Push notifications (ntfy.sh + email via Proton Bridge SMTP)
 - [ ] iOS Shortcut for one-tap pipeline trigger
 - [ ] Docker + Docker Compose for home server deployment
 - [ ] Migration to Mistral Small 3.1 24B on RTX 3090
