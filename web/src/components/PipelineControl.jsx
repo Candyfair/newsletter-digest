@@ -2,7 +2,7 @@ import { useApp } from '../context/AppContext'
 import { t } from '../i18n/translations'
 
 export default function PipelineControl({ status, progress, total, error, onRun }) {
-  const { lang } = useApp()
+  const { lang, newsletterCount } = useApp()
 
   const isRunning = status === 'running'
   const isDone    = status === 'done'
@@ -83,7 +83,7 @@ export default function PipelineControl({ status, progress, total, error, onRun 
         </div>
       )}
 
-      {isDone && (
+      {isDone && newsletterCount > 0 && (
         <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
           {t('done', lang)}
         </p>

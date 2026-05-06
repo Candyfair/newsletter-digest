@@ -8,10 +8,15 @@ export default function SummaryList({ status }) {
     selected, toggleCard,
     showConfirm, setShowConfirm,
     cancelSelection,
+    setNewsletterCount, 
   } = useApp()
 
   const [newsletters, setNewsletters] = useState([])
   const [loading, setLoading]         = useState(true)
+
+  useEffect(() => {
+    setNewsletterCount(newsletters.length)
+  }, [newsletters, setNewsletterCount])
 
   useEffect(() => {
     async function fetchIndex() {

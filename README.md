@@ -2,7 +2,7 @@
 
 Automated pipeline to export, summarize and browse newsletters via a local LLM.
 
-Reads `.eml` files exported from Proton Mail, summarizes each newsletter in French using a local Ollama model, and generates a browsable dark-mode HTML page organized by theme and sender. A React web interface allows triggering the pipeline, monitoring progress in real time, and managing summaries.
+Reads `.eml` files exported from Proton Mail, summarizes each newsletter in French or English using a local Ollama model, and generates a browsable dark-mode HTML page organized by theme and sender. A React web interface allows triggering the pipeline, monitoring progress in real time, and managing summaries.
 
 ---
 

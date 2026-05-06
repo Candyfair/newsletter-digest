@@ -14,6 +14,9 @@ export function AppProvider({ children }) {
   const [selected, setSelected]       = useState(new Set())
   const [showConfirm, setShowConfirm] = useState(false)
 
+  // Add newsletterCount state alongside the existing selection state
+  const [newsletterCount, setNewsletterCount] = useState(0)
+
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
@@ -46,6 +49,7 @@ export function AppProvider({ children }) {
       selected, toggleCard,
       showConfirm, setShowConfirm,
       cancelSelection,
+      newsletterCount, setNewsletterCount, 
     }}>
       <div className={theme === 'dark' ? 'dark' : ''}>
         {children}
