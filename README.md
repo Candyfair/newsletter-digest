@@ -21,7 +21,10 @@ Reads `.eml` files exported from Proton Mail, summarizes each newsletter in Fren
 - Push notifications via ntfy.sh and email on pipeline completion
 
 ---
+## Screenshot
+![Digest Ready](web/src/assets/newsletter_digest.png)
 
+---
 ## Requirements
 
 - Python 3.9+
