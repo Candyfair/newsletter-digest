@@ -33,7 +33,7 @@ export default function PipelineControl({ status, progress, total, error, onRun 
         onClick={handleRun}
         disabled={isRunning}
         className="
-          px-6 py-3 rounded-xl font-semibold text-sm tracking-wide
+          px-6 py-3 rounded-xl font-semibold text-base tracking-wide
           bg-indigo-600 text-white
           hover:bg-indigo-500 active:bg-indigo-700
           disabled:opacity-50 disabled:cursor-not-allowed

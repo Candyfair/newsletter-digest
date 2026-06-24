@@ -17,7 +17,7 @@ export default function Header() {
       bg-white border-gray-200
       dark:bg-gray-900 dark:border-gray-700
     ">
-      <h1 className="text-lg font-bold tracking-tight
+      <h1 className="text-2xl font-bold tracking-tight
         text-gray-900 dark:text-white"
       >
         Newsletter Digest
@@ -55,7 +55,7 @@ export default function Header() {
         )}
 
         {/* Language toggle */}
-        <button
+        {/* <button
           onClick={toggleLang}
           className="
             px-3 py-1.5 rounded-md text-sm font-medium
@@ -66,7 +66,7 @@ export default function Header() {
           "
         >
           {lang === 'fr' ? 'EN' : 'FR'}
-        </button>
+        </button> */}
 
         {/* Theme toggle */}
         <button

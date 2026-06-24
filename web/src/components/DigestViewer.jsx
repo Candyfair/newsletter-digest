@@ -7,7 +7,7 @@ export default function DigestViewer() {
   return (
     <section className="flex flex-col gap-3 px-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-widest
+        <h2 className="text-2xl font-semibold uppercase tracking-widest
           text-gray-500 dark:text-gray-400"
         >
           Digest
@@ -17,7 +17,7 @@ export default function DigestViewer() {
           target="_blank"
           rel="noopener noreferrer"
           className="
-            text-xs font-medium text-indigo-600 dark:text-indigo-400
+            text-lg font-medium text-indigo-600 dark:text-indigo-400
             hover:underline
           "
         >

@@ -111,7 +111,7 @@ export default function SummaryList({ status }) {
   return (
     <section className="flex flex-col gap-4 px-6 pb-10">
 
-      <h2 className="text-sm font-semibold uppercase tracking-widest
+      <h2 className="text-lg font-semibold uppercase tracking-widest
         text-gray-500 dark:text-gray-400"
       >
         Newsletters
@@ -127,7 +127,7 @@ export default function SummaryList({ status }) {
             flex flex-col gap-5 p-6 rounded-2xl w-80
             bg-white dark:bg-gray-800 shadow-xl
           ">
-            <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
+            <p className="text-base font-medium text-gray-800 dark:text-gray-100">
               {t('confirmDelete', lang)}
             </p>
             <div className="flex justify-end gap-3">
@@ -162,7 +162,7 @@ export default function SummaryList({ status }) {
       <div className="flex flex-col gap-10">
         {sortedThemes.map(theme => (
           <div key={theme} className="flex flex-col gap-6">
-            <h2 className="text-sm font-semibold uppercase tracking-widest
+            <h2 className="text-base font-semibold uppercase tracking-widest
               text-indigo-500 dark:text-indigo-400 border-b border-gray-200
               dark:border-gray-700 pb-2"
             >
@@ -178,7 +178,7 @@ export default function SummaryList({ status }) {
               })
               .map(sender => (
                 <div key={sender} className="flex flex-col gap-3">
-                  <h3 className="text-xs font-semibold uppercase tracking-widest
+                  <h3 className="text-sm font-semibold uppercase tracking-widest
                     text-gray-400 dark:text-gray-500"
                   >
                     {sender}
@@ -191,7 +191,7 @@ export default function SummaryList({ status }) {
                         key={nl.id}
                         onClick={() => toggleCard(nl.id)}
                         className={`
-                          flex flex-col gap-2 p-4 rounded-xl border cursor-pointer
+                          flex flex-col gap-6 p-4 rounded-xl border cursor-pointer
                           transition-all select-none
                           ${isSelected
                             ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40'
@@ -201,14 +201,14 @@ export default function SummaryList({ status }) {
                           }
                         `}
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="text-sm font-semibold
+                        <div className="flex flex-col items-start justify-between gap-2">
+                          <span className="text-lg font-semibold
                             text-gray-900 dark:text-white"
                           >
                             {nl.subject}
                           </span>
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                            <span className="text-base text-gray-400 dark:text-gray-500">
                               {formatDate(nl.date)}
                             </span>
                             {isSelected && (
@@ -218,7 +218,7 @@ export default function SummaryList({ status }) {
                         </div>
 
                         {nl.summary && (
-                          <p className="text-sm leading-relaxed
+                          <p className="text-lg leading-relaxed
                             text-gray-600 dark:text-gray-400"
                           >
                             {nl.summary}
